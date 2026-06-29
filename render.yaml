@@ -1,0 +1,32 @@
+# Render blueprint — Crafted Bistro backend (Django + DRF + Channels via Daphne).
+# Frontend deploys separately on Vercel; the database is Supabase.
+#
+# In Render: New + → Blueprint → pick this repo. You'll be prompted for the
+# env vars marked `sync: false` (set DATABASE_URL to the Supabase POOLER URL).
+services:
+  - type: web
+    name: restaurant-ims-backend
+    runtime: python
+    region: singapore
+    plan: free
+    healthCheckPath: /api/health/
+    buildCommand: >-
+      pip install -r backend/requirements.txt &&
+      python backend/manage.py collectstatic --noinput &&
+      python backend/manage.py migrate
+    startCommand: cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SECRET_KEY
+        generateValue: true        # Render generates a strong secret
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        sync: false                # Supabase pooler URL (Singapore), incl. password
+      - key: ALLOWED_HOSTS
+        sync: false                # e.g. restaurant-ims-backend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false                # e.g. https://restaurant-ims.vercel.app
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false                # e.g. https://restaurant-ims.vercel.app

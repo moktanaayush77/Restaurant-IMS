@@ -1,0 +1,178 @@
+@import 'tailwindcss';
+
+/* Self-hosted variable fonts — no external CDN, works on an offline LAN. */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+
+/*
+  ─────────────────────────────────────────────────────────────────────────
+  CRAFTED BISTRO — design system
+  A warm, editorial hospitality language: ink on cream paper, terracotta as
+  the signature, olive as a quiet second, brass for moments of warmth. The
+  serif (Fraunces) does real editorial work; elevation is mostly hairline
+  rules and warm paper layering rather than floating drop-shadows.
+  Tailwind v4 reads these tokens and generates utilities (bg-clay-500, …).
+  ─────────────────────────────────────────────────────────────────────────
+*/
+@theme {
+  --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+
+  /* ── Brand · terracotta (the signature) ─────────────────────────────── */
+  --color-clay-50: #fbefe7;
+  --color-clay-100: #f6dbcb;
+  --color-clay-200: #edb9a0;
+  --color-clay-300: #e08f6c;
+  --color-clay-400: #d06a41;
+  --color-clay-500: #be4f26;
+  --color-clay-600: #a5401c;
+  --color-clay-700: #863218;
+  --color-clay-800: #682715;
+  --color-clay-900: #4b1d12;
+
+  /* ── Warm neutral · ink (text + paper) ──────────────────────────────── */
+  --color-ink-50: #f7efe1;   /* page — warm cream paper                    */
+  --color-ink-100: #efe5d4;
+  --color-ink-200: #e3d6bf;  /* hairline rules / borders                   */
+  --color-ink-300: #ccbb9d;
+  --color-ink-400: #a99a7d;
+  --color-ink-500: #7d6f57;  /* muted / secondary text                     */
+  --color-ink-600: #5b4f3c;
+  --color-ink-700: #423a2c;  /* body text                                  */
+  --color-ink-800: #2a241a;  /* strong text                                */
+  --color-ink-900: #1a160f;  /* headings                                   */
+  --color-ink-950: #100d08;
+
+  /* ── Surfaces · warm whites that sit above the cream page ───────────── */
+  --color-surface: #fdfaf3;        /* cards, panels                        */
+  --color-surface-raised: #fffdf8; /* popovers, modals, inputs             */
+  --color-surface-sunk: #f1e7d6;   /* wells, tracks, inset rows            */
+
+  /* ── Olive · the quiet second ───────────────────────────────────────── */
+  --color-olive-50: #f3f2e6;
+  --color-olive-100: #e5e4c9;
+  --color-olive-300: #b7b785;
+  --color-olive-500: #6f7045;
+  --color-olive-600: #585a36;
+  --color-olive-700: #44462a;
+
+  /* ── Brass · warmth + emphasis (active, prices, premium) ────────────── */
+  --color-brass-300: #d9b873;
+  --color-brass-400: #c8a050;
+  --color-brass-500: #b08433;
+  --color-brass-600: #8f6a26;
+
+  /* ── Status · warm-tuned ────────────────────────────────────────────── */
+  --color-success-50: #e9f3ec;
+  --color-success-500: #2f8f62;
+  --color-success-600: #246f4d;
+  --color-success-700: #1c5a3e;
+  --color-warn-50: #f8efd8;
+  --color-warn-500: #c8881a;
+  --color-warn-600: #a26c10;
+  --color-danger-50: #f8e8e3;
+  --color-danger-500: #c13b2a;
+  --color-danger-600: #9f2e20;
+
+  /* ── Warm elevation (used sparingly, for true overlays) ─────────────── */
+  --shadow-card: 0 1px 2px rgba(42, 36, 26, 0.04), 0 1px 1px rgba(42, 36, 26, 0.03);
+  --shadow-raised: 0 4px 16px -4px rgba(42, 36, 26, 0.12), 0 2px 6px -2px rgba(42, 36, 26, 0.08);
+  --shadow-overlay: 0 24px 48px -12px rgba(26, 22, 15, 0.28), 0 8px 20px -8px rgba(26, 22, 15, 0.16);
+
+  /* ── Radii — softened, not pill-everything ──────────────────────────── */
+  --radius-card: 14px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Inter: contextual alternates + stylistic set for a less default feel */
+    font-feature-settings: 'cv05', 'cv11', 'ss01';
+  }
+  body {
+    @apply bg-ink-50 text-ink-700 font-sans antialiased;
+    /* Faint warm paper glow — sells "menu paper" without a dot-grid cliché */
+    background-image:
+      radial-gradient(circle at 100% 0, rgba(190, 79, 38, 0.04), transparent 38%),
+      radial-gradient(circle at 0 100%, rgba(111, 112, 69, 0.04), transparent 42%);
+    background-attachment: fixed;
+  }
+
+  /* Editorial headings: serif, optical-size aware, tight, warm-black */
+  h1, h2, h3 {
+    @apply font-display text-ink-900;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+  }
+  h1 { font-variation-settings: 'opsz' 80, 'SOFT' 0, 'WONK' 0; }
+
+  /* Prices, quantities, timers, totals read as data — tabular figures */
+  .nums, .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'cv05' 1;
+  }
+
+  /* Larger default tap targets — these screens live on tablets. */
+  button, [role='button'] {
+    touch-action: manipulation;
+  }
+
+  /* Warm, on-brand selection */
+  ::selection {
+    background: var(--color-clay-200);
+    color: var(--color-clay-900);
+  }
+  :focus-visible {
+    outline: none;
+  }
+
+  /* Slimmer, warm scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink-300) transparent;
+  }
+}
+
+@layer components {
+  /*
+    Signature motif: the menu dotted leader. Drop <span class="leader" /> between
+    a dish name and its price and the gap fills with menu-style dots.
+  */
+  .leader {
+    flex: 1 1 auto;
+    align-self: center;
+    height: 0;
+    margin: 0 0.5rem;
+    border-bottom: 1px dotted var(--color-ink-300);
+    transform: translateY(-0.18em);
+  }
+
+  /* Small, wide-tracked label — the "fine print" voice of the system */
+  .eyebrow {
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-ink-500);
+  }
+
+  /* Kitchen / receipt ticket: perforated top & bottom edge on warm paper */
+  .ticket {
+    position: relative;
+    background: var(--color-surface-raised);
+  }
+  .ticket::before,
+  .ticket::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background-image: radial-gradient(circle at 6px 0, transparent 5px, var(--color-surface-raised) 5px);
+    background-size: 14px 8px;
+    background-repeat: repeat-x;
+  }
+  .ticket::before { top: -8px; transform: rotate(180deg); }
+  .ticket::after { bottom: -8px; }
+}

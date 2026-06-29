@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django
+*.sqlite3
+/backend/staticfiles/
+/backend/media/
+.env
+
+# Node / frontend
+node_modules/
+/frontend/dist/
+/frontend/.vite/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Claude Code local config
+.claude/

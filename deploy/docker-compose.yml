@@ -1,0 +1,65 @@
+# In-house production stack. Run from the repo root:
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+#
+# Tablets, kitchen and reception screens then open http://<server-ip>/ on the LAN.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-restaurant}
+      POSTGRES_USER: ${POSTGRES_USER:-restaurant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-restaurant}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-restaurant}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: 'False'
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-*}
+      DATABASE_URL: postgres://${POSTGRES_USER:-restaurant}:${POSTGRES_PASSWORD:-restaurant}@db:5432/${POSTGRES_DB:-restaurant}
+      REDIS_URL: redis://redis:6379/0
+      TIME_ZONE: ${TIME_ZONE:-Asia/Kathmandu}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+      SEED_DEMO: ${SEED_DEMO:-false}
+    volumes:
+      - media:/app/media
+      - static:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - media:/usr/share/nginx/media:ro
+      - static:/usr/share/nginx/static:ro
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  media:
+  static:

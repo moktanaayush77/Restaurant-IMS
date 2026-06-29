@@ -1,0 +1,12 @@
+# Security headers for the deployed static site (Cloudflare Pages reads this file
+# from the build output). No effect on local `vite` dev.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+# Content-Security-Policy — the main defense-in-depth against XSS (F9).
+# Enable once the production API/WS domains are known: replace <API_HOST> and
+# <WS_HOST> with the Render backend host, then move the next line up under /*:
+#   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://<SUPABASE_STORAGE_HOST>; font-src 'self'; connect-src 'self' https://<API_HOST> wss://<WS_HOST>; frame-ancestors 'none'; base-uri 'self'; form-action 'self'

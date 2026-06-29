@@ -1,0 +1,19 @@
+{
+  "name": "Restaurant POS",
+  "short_name": "POS",
+  "description": "In-house restaurant order, kitchen, billing and reception system.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1c1917",
+  "theme_color": "#a8472a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
