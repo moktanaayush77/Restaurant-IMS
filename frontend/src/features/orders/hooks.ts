@@ -84,6 +84,17 @@ export function useKitchenCompletedToday() {
   })
 }
 
+/** Today's finished tickets (read-only history for the kitchen board). */
+export function useKitchenHistory(enabled = true) {
+  return useQuery({
+    enabled,
+    queryKey: ['orders', 'kitchen-history'],
+    queryFn: async () =>
+      (await api.get<Paginated<Order>>('/orders/', { params: { done: 'today', page_size: 500 } }))
+        .data.results,
+  })
+}
+
 /** All active orders for one table (used by the waiter order screen). */
 export function useTableOrders(tableId: number | undefined) {
   return useQuery({

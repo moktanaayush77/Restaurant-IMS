@@ -87,8 +87,8 @@ export function InventoryPage() {
             }
           />
         ) : (
-          <Card className="overflow-hidden">
-            <table className="w-full text-sm">
+          <Card className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b border-ink-200 bg-surface-sunk text-left text-ink-500">
                 <tr className="text-[0.65rem] font-semibold uppercase tracking-[0.12em]">
                   <th className="px-4 py-3">Item</th>

@@ -48,8 +48,8 @@ export function StaffPage() {
             }
           />
         ) : (
-          <div className="overflow-hidden rounded-card border border-ink-200 bg-surface shadow-card">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-card border border-ink-200 bg-surface shadow-card">
+            <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="eyebrow border-b border-ink-200 bg-surface-sunk/60 text-left text-ink-400">
                   <th className="px-5 py-3 font-medium">Name</th>

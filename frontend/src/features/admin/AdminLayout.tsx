@@ -37,7 +37,51 @@ export function AdminLayout() {
   const nav = NAV.filter((n) => user && n.roles.includes(user.role))
 
   return (
-    <div className="flex min-h-screen bg-ink-50">
+    <div className="flex min-h-screen flex-col bg-ink-50 md:flex-row">
+      {/* Mobile top bar + scrollable nav (the sidebar is desktop-only). */}
+      <div className="md:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-ink-200 bg-surface/95 px-4 py-2.5 backdrop-blur-md">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-clay-600 font-display text-base font-semibold text-clay-50">
+              {name.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate font-display text-sm font-semibold leading-tight text-ink-900">
+                {name}
+              </p>
+              <p className="eyebrow leading-none">{roleLabel}</p>
+            </div>
+          </div>
+          <button
+            onClick={logout}
+            title="Sign out"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-600"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
+        </header>
+        <nav className="sticky top-[3.25rem] z-20 flex gap-1.5 overflow-x-auto border-b border-ink-200 bg-surface px-3 py-2">
+          {nav.map(({ to, end, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                cn(
+                  'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-clay-600 text-white'
+                    : 'bg-surface-sunk text-ink-600 hover:bg-ink-100',
+                )
+              }
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
       <aside className="hidden w-64 shrink-0 flex-col border-r border-ink-200 bg-surface md:flex">
         <div className="flex items-center gap-3 px-5 py-5">
           <span className="grid h-10 w-10 place-items-center rounded-lg bg-clay-600 font-display text-lg font-semibold text-clay-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">

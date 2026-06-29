@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Check, ChefHat, Clock, Flame, Soup, Wifi, WifiOff } from 'lucide-react'
+import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
 import { cn } from '../../lib/cn'
@@ -9,17 +10,20 @@ import type { Order } from '../../types'
 import {
   useItemAction,
   useKitchenCompletedToday,
+  useKitchenHistory,
   useLiveOrders,
   useOrderAction,
   useOrders,
   useVoidRespond,
 } from '../orders/hooks'
-import { waitUrgency } from '../orders/status'
+import { ORDER_STATUS_META, waitUrgency } from '../orders/status'
 
 export function KitchenHome() {
   const toast = useToast()
+  const [tab, setTab] = useState<'active' | 'done'>('active')
   const { data: orders, isLoading } = useOrders('kitchen')
   const { data: completedToday } = useKitchenCompletedToday()
+  const { data: history } = useKitchenHistory(tab === 'done')
 
   const live = useLiveOrders({
     onPlaced: (o) => toast(`New order · ${o.table_name}`, 'info'),
@@ -66,25 +70,84 @@ export function KitchenHome() {
         </span>
       </div>
 
-      {isLoading ? (
-        <div className="grid place-items-center py-24">
-          <Spinner className="h-8 w-8 text-clay-400" />
-        </div>
-      ) : !tickets.length ? (
-        <div className="grid place-items-center py-24 text-center">
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-white/5 text-brass-300 ring-1 ring-white/10">
-            <Soup className="h-8 w-8" />
+      {/* Active / Completed tabs */}
+      <div className="mb-5 inline-flex rounded-lg bg-white/5 p-1 ring-1 ring-inset ring-white/10">
+        {(['active', 'done'] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={cn(
+              'rounded-md px-4 py-1.5 text-sm font-semibold transition-colors',
+              tab === t ? 'bg-clay-600 text-white' : 'text-ink-300 hover:text-white',
+            )}
+          >
+            {t === 'active' ? 'Active' : 'Completed today'}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'active' ? (
+        isLoading ? (
+          <div className="grid place-items-center py-24">
+            <Spinner className="h-8 w-8 text-clay-400" />
           </div>
-          <h2 className="mt-5 font-display text-2xl font-semibold text-white">All caught up</h2>
-          <p className="mt-1 text-sm text-ink-400">New orders appear here the moment they’re sent.</p>
-        </div>
+        ) : !tickets.length ? (
+          <div className="grid place-items-center py-24 text-center">
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-white/5 text-brass-300 ring-1 ring-white/10">
+              <Soup className="h-8 w-8" />
+            </div>
+            <h2 className="mt-5 font-display text-2xl font-semibold text-white">All caught up</h2>
+            <p className="mt-1 text-sm text-ink-400">New orders appear here the moment they’re sent.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {tickets.map((order) => (
+              <Ticket key={order.id} order={order} />
+            ))}
+          </div>
+        )
+      ) : !history?.length ? (
+        <p className="py-24 text-center text-sm text-ink-400">No tickets completed today yet.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {tickets.map((order) => (
-            <Ticket key={order.id} order={order} />
+        <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...history].reverse().map((order) => (
+            <HistoryTicket key={order.id} order={order} />
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function HistoryTicket({ order }: { order: Order }) {
+  const lines = order.items.filter((l) => l.status !== 'CANCELLED')
+  const meta = ORDER_STATUS_META[order.status]
+  return (
+    <div className="ticket flex flex-col p-4 text-ink-800 opacity-90 shadow-raised">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="font-display text-lg font-semibold leading-none text-ink-900">
+            {order.table_name}
+          </p>
+          <p className="eyebrow mt-1.5">
+            #{order.id} · {order.waiter_name || 'Waiter'} · {minutesSince(order.created_at)}m ago
+          </p>
+        </div>
+        {meta && <Badge tone={meta.tone}>{meta.label}</Badge>}
+      </div>
+      <ul className="mt-3 space-y-1 border-t border-dashed border-ink-300 pt-3 text-sm">
+        {lines.map((l) => (
+          <li key={l.id} className="flex items-center gap-2">
+            <span className="nums font-display font-semibold text-clay-600">{l.quantity}×</span>
+            <span className="flex-1 truncate text-ink-700">{l.name_snapshot}</span>
+            {l.packed && (
+              <span className="text-[0.6rem] font-bold uppercase tracking-wide text-olive-700">
+                Pack
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
